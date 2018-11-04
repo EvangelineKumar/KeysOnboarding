@@ -16,7 +16,7 @@
         </div>
         <div>
             @Html.LabelFor(model => model.CreateProduct.Price)
-            @Html.TextBoxFor(model => model.CreateProduct.Price, new { @class = "form-control", @placeholder = "Price", @data_bind = "value: Price, valueUpdate: 'afterkeydown'", @id = "Price" })
+            @Html.TextBoxFor(model => model.CreateProduct.Price, new { @class = "form-control", @placeholder = "Price", @data_bind = "value: Price, valueUpdate: 'afterkeydown'", @id = "Price", @type = "number" })
         </div>
         @*<input type="reset" value="Save" class="btn btn-default" id="btnSubmit2" />*@
 

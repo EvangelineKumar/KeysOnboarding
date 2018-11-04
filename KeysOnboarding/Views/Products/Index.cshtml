@@ -49,7 +49,7 @@
                                 <span id="prodMessage"></span>
                             </div>
                             <div>
-                                @Html.TextBoxFor(model => model.CreateProduct.Price, new { @class = "form-control", @placeholder = "Price", @data_bind = "value: Price, valueUpdate: 'afterkeydown'" })
+                                @Html.TextBoxFor(model => model.CreateProduct.Price, new { @class = "form-control", @placeholder = "Price", @data_bind = "value: Price, valueUpdate: 'afterkeydown'", @type = "number" })
                                 @Html.ValidationMessageFor(model => model.CreateProduct.Price, "")
                             </div>
                         </form>
