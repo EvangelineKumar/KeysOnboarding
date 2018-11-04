@@ -1,0 +1,66 @@
+﻿@model KeysOnboarding.ViewModel.SalesViewModel
+<style>
+    .validationMessage {
+        color: red;
+    }
+</style>
+<div>
+    <form id="myFormEdit">
+        @Html.HiddenFor(m => m.ProductSold.Id)
+        <div>
+            @Html.DropDownListFor(model => model.ProductSold.ProductId, ViewBag.ProductList as SelectList, "Select Product", new { @class = "form-control", @id = "product", @data_bind = "value:Product" })
+        </div>
+        <div>
+            @Html.DropDownListFor(model => model.ProductSold.CustomerId, ViewBag.CustomerList as SelectList, "Select Customer", new { @class = "form-control", @id = "customer", @data_bind = "value:Customer" })            
+        </div>
+        <div>
+            @Html.DropDownListFor(model => model.ProductSold.StoreId, ViewBag.StoreList as SelectList, "Select Store", new { @class = "form-control", @id = "store", @data_bind = "value:Store" })
+        </div>
+        <div>
+            @Html.EditorFor(model => model.ProductSold.DateSold, new { @class = "form-control", @id = "DateSold", @data_bind = "value:DateSold, valueUpdate: 'keyup'" })
+            <span id="prodEditMessage"></span>
+        </div>
+        @*@Html.EditorFor(model => model.ProductSold.DateSold, new { @class = "form-control", @placeholder = "Date in dd/mm/yyyy format", @id = "Date" })*@
+
+    </form>
+</div>
+
+<script src="~/Scripts/knockout-3.4.2.debug.js"></script>
+<script src="~/Scripts/knockout.validation.js"></script>
+<script>
+    $(document).ready(function () {
+        (function ($) {
+
+            var valid = {
+                Customer: ko.observable($("#Customer")).extend({ required: true }),
+                Product: ko.observable($("#Product")).extend({ required: true }),
+                Store: ko.observable($("#Store")).extend({ required: true }),
+                Date: ko.observable($("#DateSold").val()).extend({ required: true })
+            };
+
+
+            ko.applyBindings(valid);
+        }($))
+        $("#btnSubmitEdit").click(function () {
+            var data = $("#myFormEdit").serialize();
+            $.ajax({
+                type: "POST",
+                url: "/ProductSolds/Index",
+                data: data,
+                success: function (response) {
+                    var message = $("#prodEditMessage");
+
+                    if (response) {
+                        $("#myModal").modal("hide");
+                        window.location.href = "/ProductSolds/Index";
+                    }
+                    else {
+                        message.html("Date property cannot accept future value. Choose another date!!");
+                    }
+                }
+            })
+        })
+    })
+</script>
+
+

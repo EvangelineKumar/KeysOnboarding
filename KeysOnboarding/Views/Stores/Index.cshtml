@@ -1,0 +1,265 @@
+﻿@model KeysOnboarding.ViewModel.StoreViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+    }
+
+    #storMessage {
+        color: red;
+    }
+
+    #storEditMessage {
+        color: red;
+    }
+</style>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+@*<script src="~/Scripts/bootstrap.min.js"></script>*@
+<script src="~/Scripts/knockout-3.4.2.js"></script>
+<script src="~/Scripts/knockout.validation.js"></script>
+
+<h2>Store</h2>
+
+
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create</a>
+    <div>
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <!-- Modal -->
+                    <div class="modal-header">
+                        <a href="#" class="close" data-dismiss="modal">&times;</a>
+                        <h3 class="modal-title">Store</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form id="myForm">
+                            <div>
+                                @Html.TextBoxFor(model => model.CreateStore.Name, new { @class = "form-control", @placeholder = "Name", @data_bind = "value: Name, valueUpdate: 'afterkeydown'" })
+                                @Html.ValidationMessageFor(m => m.CreateStore.Name, "")
+
+                                <span id="storMessage"></span>
+                            </div>
+                            <div>
+                                @Html.TextBoxFor(model => model.CreateStore.Address, new { @class = "form-control", @placeholder = "Address", @data_bind = "value: Address, valueUpdate: 'afterkeydown'" })
+                                @Html.ValidationMessageFor(model => model.CreateStore.Address, "")
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="reset" value="Save" class="btn btn-default" id="btnSubmit" data-bind="enable: Name.isValid() && Address.isValid()" />
+                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="hiddenStoreId" />
+        </div>
+    </div>
+
+    @if (!Model.Stores.Any())
+    {
+        <p style="margin:auto; width:50%; padding: 10px;">There is no data yet!!</p>
+    }
+    else
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.Label("Name")
+                </th>
+                <th>
+                    @Html.Label("Address")
+                </th>
+                <th>@Html.Label("Action(Edit)")</th>
+                <th>@Html.Label("Action(Details)")</th>
+                <th>@Html.Label("Action(Delete)")</th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.Stores)
+            {
+                <tr id="row_@item.Id">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td><a href="#" class="btn btn-warning" data-bind="enable: Name.isValid() && Address.isValid()" onclick="EditStore(@item.Id)"><i class="glyphicon glyphicon-pencil"> Edit</i> </a> </td>
+                    <td><a href="#" class="btn btn-default" onclick="ShowStore(@item.Id)"><i class="glyphicon glyphicon-tasks"> Details</i> </a> </td>
+                    <td><a href="#" class="btn btn-danger" onclick="ConfirmDelete(@item.Id)"><i class="glyphicon glyphicon-trash"> Delete</i> </a> </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+    <div class="modal fade" id="myModalDelete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Delete Store</h3>
+                </div>
+                <div class="modal-body" id="myBodyDiv">
+                    <h4>Are you sure ? You want to delete this. </h4>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <a href="#" class="btn btn-success" onclick="DeleteStores()">Confirm</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="myModalEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Edit Store</h3>
+                </div>
+                <div class="modal-body" id="myModalBodyDivEdit">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <input type="reset" value="Save" class="btn btn-default" id="btnSubmitEdit" data-bind="enable: Name.isValid() && Address.isValid()" />
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="myModalShow">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Store Details</h3>
+                </div>
+                <div class="modal-body" id="myModalBodyDivShow">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal" id="btnSubmitShow">Cancel</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <input type="hidden" id="hiddenStoreId" />
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        (function ($) {
+            var valid = {
+                Name: ko.observable().extend({ required: true, minLength: 3, maxLength: 20 }),
+                Address: ko.observable().extend({ required: true, minLength: 3, maxLength: 20 })
+            };
+            ko.applyBindings(valid);
+        }($))
+
+        $("#btnSubmit").click(function () {
+
+            var data = $("#myForm").serialize();
+            if (!$("#myForm").valid()) {
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Stores/Index",
+                data: data,
+                success: function (response) {
+                    var message = $("#storMessage");
+
+                    if (response) {
+                        $("#myModal").modal("hide");
+                        //$("#customer").add();
+                        //$("#row_" + d)
+                        window.location.href = "/Stores/Index";
+                    }
+                    else {
+                        message.html("Name already exists. Please choose a different name!");
+                    }
+                }
+            })
+
+        })
+
+    })
+
+    var ConfirmDelete = function (storeId) {
+
+        $("#hiddenStoreId").val(storeId);
+        $("#myModalDelete").modal('show');
+
+    }
+
+    var DeleteStores = function () {
+
+        var stoId = $("#hiddenStoreId").val();
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Stores/DeleteStore",
+            data: { storeId: stoId },
+            success: function (result) {
+                $("#myModalDelete").modal("hide");
+                $("#row_" + stoId).remove();
+
+            }
+
+        })
+
+    }
+
+
+    var EditStore = function (storeId) {
+        var url = "/Stores/EditStore?storeId=" + storeId;
+
+        $("#myModalBodyDivEdit").load(url, function () {
+            $("#myModalEdit").modal("show");
+
+        })
+    }
+
+    var ShowStore = function (storeId) {
+        var url = "/Stores/ShowStore?storeId=" + storeId;
+
+        $("#myModalBodyDivShow").load(url, function () {
+            $("#myModalShow").modal("show");
+
+        })
+
+    }
+
+
+</script>
+
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

@@ -1,0 +1,73 @@
+﻿@model KeysOnboarding.ViewModel.StoreViewModel
+<style>
+    .validationMessage {
+        color: red;
+    }
+</style>
+<div>
+
+    <form id="myFormEdit">
+        @Html.HiddenFor(m => m.CreateStore.Id)
+        <div>
+            @Html.LabelFor(model => model.CreateStore.Name)
+            @Html.TextBoxFor(model => model.CreateStore.Name, new { @class = "form-control", @placeholder = "Name", @data_bind = "value: Name, valueUpdate: 'afterkeydown'", @id = "Name" })
+
+            <span id="storEditMessage"></span>
+        </div>
+        <div>
+            @Html.LabelFor(model => model.CreateStore.Address)
+            @Html.TextBoxFor(model => model.CreateStore.Address, new { @class = "form-control", @placeholder = "Address", @data_bind = "value: Address, valueUpdate: 'afterkeydown'", @id = "Address" })
+        </div>
+        @*<input type="reset" value="Save" class="btn btn-default" id="btnSubmit2" />*@
+
+    </form>
+
+
+
+</div>
+<script src="~/Scripts/knockout-3.4.2.debug.js"></script>
+<script src="~/Scripts/knockout.validation.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        (function ($) {
+            var valid = {
+                Name: ko.observable($("#Name").val()).extend({ required: true, minLength: 3, maxLength: 20 }),
+                Address: ko.observable($("#Address").val()).extend({ required: true, minLength: 3, maxLength: 20 })
+            };
+            ko.applyBindings(valid);
+        }($))
+
+        $("#btnSubmitEdit").click(function () {
+            var data = $("#myFormEdit").serialize();
+            debugger
+            $.ajax({
+                type: "POST",
+                url: "/Stores/Index",
+                data: data,
+                success: function (response) {
+                    var message = $("#storEditMessage");
+
+                    if (response) {
+                        $("#myModalEdit").modal("hide");
+                        //$("#customer").add();
+                        //$("#row_" + d)
+                        window.location.href = "/Stores/Index";
+                    }
+                    else {
+                        message.html("Name already exists. Please choose a different name!");
+                    }
+                }
+            })
+
+        })
+
+    })
+
+
+</script>
+
+
+

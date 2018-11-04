@@ -1,0 +1,73 @@
+﻿@model KeysOnboarding.ViewModel.ProductViewModel
+<style>
+    .validationMessage {
+        color: red;
+    }
+</style>
+<div>
+
+    <form id="myFormEdit">
+        @Html.HiddenFor(m => m.CreateProduct.Id)
+        <div>
+            @Html.LabelFor(model => model.CreateProduct.Name)
+            @Html.TextBoxFor(model => model.CreateProduct.Name, new { @class = "form-control", @placeholder = "Name", @data_bind = "value: Name, valueUpdate: 'afterkeydown'", @id = "Name" })
+
+            <span id="prodEditMessage"></span>
+        </div>
+        <div>
+            @Html.LabelFor(model => model.CreateProduct.Price)
+            @Html.TextBoxFor(model => model.CreateProduct.Price, new { @class = "form-control", @placeholder = "Price", @data_bind = "value: Price, valueUpdate: 'afterkeydown'", @id = "Price" })
+        </div>
+        @*<input type="reset" value="Save" class="btn btn-default" id="btnSubmit2" />*@
+
+    </form>
+
+
+
+</div>
+<script src="~/Scripts/knockout-3.4.2.debug.js"></script>
+<script src="~/Scripts/knockout.validation.js"></script>
+
+<script>
+
+    $(document).ready(function () {
+
+        (function ($) {
+            var valid = {
+                Name: ko.observable($("#Name").val()).extend({ required: true, minLength: 3, maxLength: 20 }),
+                Price: ko.observable($("#Price").val()).extend({ required: true })
+            };
+            ko.applyBindings(valid);
+        }($))
+
+        $("#btnSubmitEdit").click(function () {
+            var data = $("#myFormEdit").serialize();
+            debugger
+            $.ajax({
+                type: "POST",
+                url: "/Products/Index",
+                data: data,
+                success: function (response) {
+                    var message = $("#prodEditMessage");
+
+                    if (response) {
+                        $("#myModalEdit").modal("hide");
+                        //$("#customer").add();
+                        //$("#row_" + d)
+                        window.location.href = "/Products/Index";
+                    }
+                    else {
+                        message.html("Name already exists. Please choose a different name!");
+                    }
+                }
+            })
+
+        })
+
+    })
+
+
+</script>
+
+
+

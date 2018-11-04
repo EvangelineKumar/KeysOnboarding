@@ -1,0 +1,50 @@
+﻿
+@model KeysOnboarding.ViewModel.CustomerViewModel
+
+<div>
+
+    <form id="myFormShow">
+        @Html.HiddenFor(m => m.CreateCustomer.Id)
+
+        @Html.LabelFor(model => model.CreateCustomer.Name)
+        @Html.TextBoxFor(model => model.CreateCustomer.Name, new { @class = "form-control", @placeholder = "Name", @readonly = "true" })
+
+        @Html.LabelFor(model => model.CreateCustomer.Address)
+        @Html.TextBoxFor(model => model.CreateCustomer.Address, new { @class = "form-control", @placeholder = "Address", @readonly = "true" })
+
+        @*<input type="reset" value="Save" class="btn btn-default" id="btnSubmit2" />*@
+
+    </form>
+
+
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $("#btnSubmitShow").click(function () {
+            var data = $("#myFormShow").serialize();
+            debugger
+            $.ajax({
+                type: "POST",
+                url: "/Customers/Index",
+                data: data,
+                success: function (response) {
+                    $("#myModalShow").modal("hide");
+                    //$("#customer").add();
+                    //$("#row_" + d)
+                    window.location.href = "/Customers/Index";
+                }
+            })
+
+        })
+
+    })
+
+
+</script>
+
+
+

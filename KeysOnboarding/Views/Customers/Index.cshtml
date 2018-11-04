@@ -1,0 +1,264 @@
+﻿@model KeysOnboarding.ViewModel.CustomerViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<style>
+    .field-validation-error {
+        color: red;
+    }
+    #custMessage {
+        color: red;
+    }
+
+    #custEditMessage {
+        color: red;
+    }
+</style>
+
+<script src="~/Scripts/jquery-3.3.1.min.js"></script>
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+@*<script src="~/Scripts/bootstrap.min.js"></script>*@
+<script src="~/Scripts/knockout-3.4.2.js"></script>
+<script src="~/Scripts/knockout.validation.js"></script>
+
+<h2>Customer</h2>
+
+
+<div class="container">
+    <!-- Trigger the modal with a button -->
+    <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create</a>
+    <div>
+        <div id="myModal" class="modal fade">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <!-- Modal -->
+                    <div class="modal-header">
+                        <a href="#" class="close" data-dismiss="modal">&times;</a>
+                        <h3 class="modal-title">Customer</h3>
+                    </div>
+                    <div class="modal-body">
+                        <form id="myForm">
+                            <div>
+                                @Html.TextBoxFor(model => model.CreateCustomer.Name, new { @class = "form-control", @placeholder = "Name", @data_bind = "value: Name, valueUpdate: 'afterkeydown'" })
+                                @Html.ValidationMessageFor(m => m.CreateCustomer.Name, "")
+
+                                <span id="custMessage"></span>
+                            </div>
+                            <div>
+                                @Html.TextBoxFor(model => model.CreateCustomer.Address, new { @class = "form-control", @placeholder = "Address", @data_bind = "value: Address, valueUpdate: 'afterkeydown'" })
+                                @Html.ValidationMessageFor(model => model.CreateCustomer.Address, "")
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="reset" value="Save" class="btn btn-default" id="btnSubmit" data-bind="enable: Name.isValid() && Address.isValid()" />
+                        <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="hiddenCustomerId" />
+        </div>
+    </div>
+
+    @if (!Model.Customers.Any())
+    {
+        <p style="margin:auto; width:50%; padding: 10px;">There is no data yet!!</p>
+    }
+    else
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.Label("Name")
+                </th>
+                <th>
+                    @Html.Label("Address")
+                </th>
+                <th>@Html.Label("Action(Edit)")</th>
+                <th>@Html.Label("Action(Details)")</th>
+                <th>@Html.Label("Action(Delete)")</th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.Customers)
+            {
+                <tr id="row_@item.Id">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Address)
+                    </td>
+                    <td><a href="#" class="btn btn-warning" data-bind="enable: Name.isValid() && Address.isValid()" onclick="EditCustomer(@item.Id)"><i class="glyphicon glyphicon-pencil"> Edit</i> </a> </td>
+                    <td><a href="#" class="btn btn-default" onclick="ShowCustomer(@item.Id)"><i class="glyphicon glyphicon-tasks"> Details</i> </a> </td>
+                    <td><a href="#" class="btn btn-danger" onclick="ConfirmDelete(@item.Id)"><i class="glyphicon glyphicon-trash"> Delete</i> </a> </td>
+                </tr>
+            }
+
+        </table>
+    }
+
+    <div class="modal fade" id="myModalDelete">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Delete Customer</h3>
+                </div>
+                <div class="modal-body" id="myBodyDiv">
+                    <h4>Are you sure ? You want to delete this. </h4>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <a href="#" class="btn btn-success" onclick="DeleteCustomers()">Confirm</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="myModalEdit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Edit Customer</h3>
+                </div>
+                <div class="modal-body" id="myModalBodyDivEdit">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal">Cancel</a>
+                    <input type="reset" value="Save" class="btn btn-default" id="btnSubmitEdit" data-bind="enable: Name.isValid() && Address.isValid()" />
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="myModalShow">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Customer Details</h3>
+                </div>
+                <div class="modal-body" id="myModalBodyDivShow">
+                </div>
+                <div class="modal-footer">
+                    <a href="#" class="btn btn-default" data-dismiss="modal" id="btnSubmitShow">Cancel</a>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <input type="hidden" id="hiddenCustomerId" />
+
+</div>
+
+<script>
+    $(document).ready(function () {
+        (function ($) {
+            var valid = {
+                Name: ko.observable().extend({ required: true, minLength: 3, maxLength: 20 }),
+                Address: ko.observable().extend({ required: true, minLength: 3, maxLength: 20 })
+            };
+            ko.applyBindings(valid);
+        }($))
+
+        $("#btnSubmit").click(function () {
+
+            var data = $("#myForm").serialize();
+            if (!$("#myForm").valid()) {
+                return false;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/Customers/Index",
+                data: data,
+                success: function (response) {
+                    var message = $("#custMessage");
+
+                    if (response) {
+                        $("#myModal").modal("hide");
+                        //$("#customer").add();
+                        //$("#row_" + d)
+                        window.location.href = "/Customers/Index";
+                    }
+                    else {
+                        message.html("Name already exists. Please choose a different name!");
+                    }
+                }
+            })
+
+        })
+
+    })
+
+    var ConfirmDelete = function (customerId) {
+
+        $("#hiddenCustomerId").val(customerId);
+        $("#myModalDelete").modal('show');
+
+    }
+
+    var DeleteCustomers = function () {
+
+        var cusId = $("#hiddenCustomerId").val();
+
+        $.ajax({
+
+            type: "POST",
+            url: "/Customers/DeleteCustomer",
+            data: { customerId: cusId },
+            success: function (result) {
+                $("#myModalDelete").modal("hide");
+                $("#row_" + cusId).remove();
+
+            }
+
+        })
+
+    }
+
+
+    var EditCustomer = function (customerId) {
+        var url = "/Customers/EditCustomer?customerId=" + customerId;
+
+        $("#myModalBodyDivEdit").load(url, function () {
+            $("#myModalEdit").modal("show");
+
+        })
+    }
+
+    var ShowCustomer = function (customerId) {
+        var url = "/Customers/ShowCustomer?customerId=" + customerId;
+
+        $("#myModalBodyDivShow").load(url, function () {
+            $("#myModalShow").modal("show");
+
+        })
+
+    }
+
+
+</script>
+
+
+<script src="~/Scripts/jquery.validate.min.js"></script>
+
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

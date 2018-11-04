@@ -1,0 +1,51 @@
+﻿
+@model KeysOnboarding.ViewModel.StoreViewModel
+
+<div>
+
+    <form id="myFormShow">
+        @Html.HiddenFor(m => m.CreateStore.Id)
+
+        @Html.LabelFor(model => model.CreateStore.Name)
+        @Html.TextBoxFor(model => model.CreateStore.Name, new { @class = "form-control", @placeholder = "Name", @readonly = "true" })
+
+        @Html.LabelFor(model => model.CreateStore.Address)
+        @Html.TextBoxFor(model => model.CreateStore.Address, new { @class = "form-control", @placeholder = "Address", @readonly = "true" })
+
+        @*<input type="reset" value="Save" class="btn btn-default" id="btnSubmit2" />*@
+
+    </form>
+
+
+
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $("#btnSubmitShow").click(function () {
+            var data = $("#myFormShow").serialize();
+            debugger
+            $.ajax({
+                type: "POST",
+                url: "/Stores/Index",
+                data: data,
+                success: function (response) {
+                    $("#myModalShow").modal("hide");
+                    //$("#customer").add();
+                    //$("#row_" + d)
+                    window.location.href = "/Stores/Index";
+                }
+            })
+
+        })
+
+    })
+
+
+</script>
+
+
+
+
