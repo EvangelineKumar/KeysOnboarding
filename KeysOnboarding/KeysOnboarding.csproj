@@ -172,6 +172,10 @@
     <Compile Include="Migrations\201810312025559_DeleteIsDeletedAll.Designer.cs">
       <DependentUpon>201810312025559_DeleteIsDeletedAll.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811050202032_picedatatypechange.cs" />
+    <Compile Include="Migrations\201811050202032_picedatatypechange.Designer.cs">
+      <DependentUpon>201811050202032_picedatatypechange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Customer.cs" />
     <Compile Include="Models\KeysContext.cs" />
@@ -262,6 +266,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201810312025559_DeleteIsDeletedAll.resx">
       <DependentUpon>201810312025559_DeleteIsDeletedAll.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811050202032_picedatatypechange.resx">
+      <DependentUpon>201811050202032_picedatatypechange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

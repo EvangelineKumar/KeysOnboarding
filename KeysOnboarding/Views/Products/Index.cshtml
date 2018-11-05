@@ -176,7 +176,7 @@
         (function ($) {
             var valid = {
                 Name: ko.observable().extend({ required: true, minLength: 3, maxLength: 20 }),
-                Price: ko.observable().extend({ required: true })
+                Price: ko.observable().extend({ required: true, message: "Please provide a numeric value" })
             };
             ko.applyBindings(valid);
         }($))

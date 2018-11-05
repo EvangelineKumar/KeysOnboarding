@@ -35,7 +35,7 @@
         (function ($) {
             var valid = {
                 Name: ko.observable($("#Name").val()).extend({ required: true, minLength: 3, maxLength: 20 }),
-                Price: ko.observable($("#Price").val()).extend({ required: true })
+                Price: ko.observable($("#Price").val()).extend({ required: true, message: "Please provide a numeric value" })
             };
             ko.applyBindings(valid);
         }($))
